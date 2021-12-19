@@ -8,6 +8,11 @@ class Tree(StructuredNode):
     species_german = StringProperty()
     crown_diameter = FloatProperty()
     circumference = FloatProperty()
+    utm_east = StringProperty()
+    utm_north = StringProperty()
+    utm_zone = StringProperty()
+    lat = StringProperty()
+    long = StringProperty()
 
     genus = RelationshipTo('Genus', 'IS')
     district = RelationshipTo('District', 'IN')

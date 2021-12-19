@@ -5,6 +5,8 @@ from datetime import datetime
 from textwrap import wrap
 import json
 import glob
+from multiprocessing.dummy import Pool
+import multiprocessing
 
 # Regnie source:
 # https://opendata.dwd.de/climate_environment/CDC/grids_germany/daily/regnie/
@@ -14,12 +16,20 @@ with open('data/regnie_to_district.json', 'r', encoding='utf-8') as f:
     district_points = json.load(f)
 
 
+# Use multiprocessing for the maps of each year
 def calculate_average_daily_district_p_h():
     average_daily_district_p_h = {}
     for archive in glob.glob('data/ra*.tar'):
-        for file_name, daily_p_h_map in __read_archive(archive).items():
-            date = datetime.strptime(file_name[2:-3], '%y%m%d').date()
-            average_daily_district_p_h[date] = __process_map(daily_p_h_map)
+
+        input_tuples = [(file_name, daily_p_h_map) for file_name, daily_p_h_map in __read_archive(archive).items()]
+
+        pool = Pool(multiprocessing.cpu_count())
+        result_tuples = pool.map(__process_map, input_tuples)
+        pool.close()
+        pool.join()
+
+        for t in result_tuples:
+            average_daily_district_p_h[t[0]] = t[1]
 
     return average_daily_district_p_h
 
@@ -46,7 +56,10 @@ def __read_archive(path):
 
 
 # Calculate average rainfall per district from daily map
-def __process_map(p_h_map):
+def __process_map(y):
+    file_name, p_h_map = y
+    date = datetime.strptime(file_name[2:-3], '%y%m%d').date()
+
     p_h_values = {district: [] for district in district_points}
     for row, line in enumerate(p_h_map.splitlines()):
         # Skip lines without data
@@ -74,4 +87,4 @@ def __process_map(p_h_map):
     for district, values in p_h_values.items():
         p_h_values[district] = sum(p_h_values[district]) / len(p_h_values[district])
 
-    return p_h_values
+    return date, p_h_values

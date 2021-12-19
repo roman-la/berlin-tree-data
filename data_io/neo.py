@@ -7,6 +7,13 @@ config.DATABASE_URL = 'bolt://neo4j:ezpw@localhost:7687'
 genera_neo = {}
 districts_neo = {}
 
+# Get existing nodes and add to reference dicts
+for genus in Genus.nodes.all():
+    genera_neo[genus.name] = genus
+
+for district in District.nodes.all():
+    districts_neo[district.name] = district
+
 
 def clear_db():
     db.cypher_query('MATCH (n) DETACH DELETE n')
@@ -26,7 +33,7 @@ def create_districts(districts):
 
 @db.transaction
 def create_trees(trees):
-    for i, tree in enumerate(trees):
+    for tree in trees:
         district = tree.pop('district')
         genus = tree.pop('genus')
         tree_neo = Tree.create(tree)[0]

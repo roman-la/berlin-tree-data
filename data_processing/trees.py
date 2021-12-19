@@ -1,6 +1,8 @@
 import json
 import utm
 from datetime import datetime
+from multiprocessing.dummy import Pool
+import multiprocessing
 
 
 # Data sources:
@@ -31,99 +33,106 @@ def get_trees():
     return combined_trees
 
 
-# Read file and convert raw data to unified format, also converting utm coordinates to wgs84 (lat, long)
+# Read file and start tree processing with multiprocessing
 def __process_raw_tree_data(path):
     with open(path, encoding='utf-8') as f:
         trees_raw = json.load(f)['features']
 
-    trees = []
-    for tree_raw in trees_raw:
-        tree = {'tree_id': tree_raw['id']}
+    pool = Pool(multiprocessing.cpu_count())
+    trees = pool.map(process_tree, trees_raw)
+    pool.close()
+    pool.join()
 
-        tree_raw_props = tree_raw['properties']
+    return [x for x in trees if x]
 
-        # District (skip whole tree if no district given)
-        if 'bezirk' in tree_raw_props:
-            if len(tree_raw_props['bezirk']) < 5:
-                continue
-            else:
-                tree['district'] = tree_raw_props['bezirk']
+
+# Convert raw data to unified format, also converting utm coordinates to wgs84 (lat, long)
+def process_tree(tree_raw):
+    tree = {'tree_id': tree_raw['id']}
+
+    tree_raw_props = tree_raw['properties']
+
+    # District (skip whole tree if no district given)
+    if 'bezirk' in tree_raw_props:
+        if len(tree_raw_props['bezirk']) < 5:
+            return
         else:
-            continue
+            tree['district'] = tree_raw_props['bezirk']
+    else:
+        return
 
-        # Genus (skip whole tree if no genus given)
-        if 'gattung_botanisch' in tree_raw_props:
-            if len(tree_raw_props['gattung_botanisch']) > 1:
-                tree['genus'] = tree_raw_props['gattung_botanisch'].title()
-            else:
-                continue
-        elif 'gattung' in tree_raw_props:
-            if len(tree_raw_props['gattung']) > 1:
-                tree['genus'] = tree_raw_props['gattung'].title()
-            else:
-                continue
+    # Genus (skip whole tree if no genus given)
+    if 'gattung_botanisch' in tree_raw_props:
+        if len(tree_raw_props['gattung_botanisch']) > 1:
+            tree['genus'] = tree_raw_props['gattung_botanisch'].title()
         else:
-            continue
+            return
+    elif 'gattung' in tree_raw_props:
+        if len(tree_raw_props['gattung']) > 1:
+            tree['genus'] = tree_raw_props['gattung'].title()
+        else:
+            return
+    else:
+        return
 
-        # Coordinates
-        if 'geometry' in tree_raw_props:
-            utm_east = tree_raw_props['geometry']['coordinates'][0]
-            utm_north = tree_raw_props['geometry']['coordinates'][1]
-            tree['utm_east'] = utm_east
-            tree['utm_north'] = utm_north
-            tree['lat'], tree['long'] = utm.to_latlon(utm_east, utm_north, 33, 'U')
+    # Coordinates
+    if 'geometry' in tree_raw:
+        utm_east = tree_raw['geometry']['coordinates'][0]
+        utm_north = tree_raw['geometry']['coordinates'][1]
+        tree['utm_east'] = utm_east
+        tree['utm_north'] = utm_north
+        tree['utm_zone'] = '33U'
+        tree['lat'], tree['long'] = utm.to_latlon(utm_east, utm_north, 33, 'U')
 
-        # Height
-        if 'baumhoehe_akt' in tree_raw_props:
-            try:
-                tree['height'] = float(tree_raw_props['baumhoehe_akt'])
-            except:
-                pass
-        elif 'baumhoehe' in tree_raw_props:
-            try:
-                tree['height'] = float(tree_raw_props['baumhoehe'])
-            except:
-                pass
+    # Height
+    if 'baumhoehe_akt' in tree_raw_props:
+        try:
+            tree['height'] = float(tree_raw_props['baumhoehe_akt'])
+        except:
+            pass
+    elif 'baumhoehe' in tree_raw_props:
+        try:
+            tree['height'] = float(tree_raw_props['baumhoehe'])
+        except:
+            pass
 
-        # Plant year
-        if 'pflanzjahr' in tree_raw_props:
-            try:
-                tree['planting_year'] = datetime.strptime(tree_raw_props['pflanzjahr'], '%Y').date()
-            except:
-                pass
+    # Plant year
+    if 'pflanzjahr' in tree_raw_props:
+        try:
+            tree['planting_year'] = datetime.strptime(tree_raw_props['pflanzjahr'], '%Y').date()
+        except:
+            pass
 
-        # Species german
-        if 'art_deutsch' in tree_raw_props:
-            if len(tree_raw_props['art_deutsch']) > 1:
-                tree['species_botanical'] = tree_raw_props['art_deutsch']
-        elif 'art_dtsch' in tree_raw_props:
-            if len(tree_raw_props['art_dtsch']) > 1:
-                tree['species_german'] = tree_raw_props['art_dtsch']
+    # Species german
+    if 'art_deutsch' in tree_raw_props:
+        if len(tree_raw_props['art_deutsch']) > 1:
+            tree['species_german'] = tree_raw_props['art_deutsch']
+    elif 'art_dtsch' in tree_raw_props:
+        if len(tree_raw_props['art_dtsch']) > 1:
+            tree['species_german'] = tree_raw_props['art_dtsch']
 
-        # Crown diameter
-        if 'kronendurchmesser_akt' in tree_raw_props:
-            try:
-                tree['crown_diameter'] = float(tree_raw_props['kronendurchmesser_akt'])
-            except:
-                pass
-        elif 'kronedurch' in tree_raw_props:
-            try:
-                tree['crown_diameter'] = float(tree_raw_props['kronedurch'])
-            except:
-                pass
+    # Crown diameter
+    if 'kronendurchmesser_akt' in tree_raw_props:
+        try:
+            tree['crown_diameter'] = float(tree_raw_props['kronendurchmesser_akt'])
+        except:
+            pass
+    elif 'kronedurch' in tree_raw_props:
+        try:
+            tree['crown_diameter'] = float(tree_raw_props['kronedurch'])
+        except:
+            pass
 
-        # Circumference
-        if 'stammumfang_akt' in tree_raw_props:
-            try:
-                tree['circumference'] = float(tree_raw_props['stammumfang_akt'])
-            except:
-                pass
-        elif 'stammumfg' in tree_raw_props:
-            try:
-                tree['circumference'] = float(tree_raw_props['stammumfg'])
-            except:
-                pass
+    # Circumference
+    if 'stammumfang_akt' in tree_raw_props:
+        try:
+            tree['circumference'] = float(tree_raw_props['stammumfang_akt'])
+        except:
+            pass
+    elif 'stammumfg' in tree_raw_props:
+        try:
+            tree['circumference'] = float(tree_raw_props['stammumfg'])
+        except:
+            pass
 
-        trees.append(tree)
-
-    return trees
+    return tree
