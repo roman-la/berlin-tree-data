@@ -1,0 +1,210 @@
+{
+  "Robinia": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1600
+      ]
+    ]
+  },
+  "Acer": {
+    "precipitation_height_intervals": [
+      [
+        750,
+        950
+      ]
+    ]
+  },
+  "Abies": {
+    "precipitation_height_intervals": [
+      [
+        800,
+        1600
+      ],
+      [
+        800,
+        1600
+      ],
+      [
+        350,
+        2800
+      ],
+      [
+        800,
+        2400
+      ]
+    ]
+  },
+  "Betula": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        2000
+      ]
+    ]
+  },
+  "Carpinus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1400
+      ]
+    ]
+  },
+  "Castanea": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1600
+      ]
+    ]
+  },
+  "Corylus": {
+    "precipitation_height_intervals": [
+      [
+        540,
+        1500
+      ]
+    ]
+  },
+  "Platanus": {
+    "precipitation_height_intervals": [
+      [
+        350,
+        2340
+      ]
+    ]
+  },
+  "Prunus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1400
+      ]
+    ]
+  },
+  "Quercus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1400
+      ],
+      [
+        400,
+        1300
+      ],
+      [
+        400,
+        1000
+      ],
+      [
+        400,
+        1400
+      ],
+      [
+        760,
+        2030
+      ]
+    ]
+  },
+  "Tilia": {
+    "precipitation_height_intervals": [
+      [
+        700,
+        950
+      ],
+      [
+        500,
+        600
+      ]
+    ]
+  },
+  "Pinus": {
+    "precipitation_height_intervals": [
+      [
+        280,
+        1750
+      ]
+    ]
+  },
+  "Ostrya": {
+    "precipitation_height_intervals": [
+      [
+        500,
+        1300
+      ]
+    ]
+  },
+  "Larix": {
+    "precipitation_height_intervals": [
+      [
+        1658,
+        2178
+      ]
+    ]
+  },
+  "Sorbus": {
+    "precipitation_height_intervals": [
+      [
+        700,
+        1500
+      ]
+    ]
+  },
+  "Populus": {
+    "precipitation_height_intervals": [
+      [
+        890,
+        1500
+      ]
+    ]
+  },
+  "Fraxinus": {
+    "precipitation_height_intervals": [
+      [
+        300,
+        3000
+      ]
+    ]
+  },
+  "Ulmus": {
+    "precipitation_height_intervals": [
+      [
+        760,
+        1270
+      ]
+    ]
+  },
+  "Fagus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1500
+      ]
+    ]
+  },
+  "Picea": {
+    "precipitation_height_intervals": [
+      [
+        500,
+        3000
+      ]
+    ]
+  },
+  "Alnus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        2000
+      ]
+    ]
+  },
+  "Aesculus": {
+    "precipitation_height_intervals": [
+      [
+        400,
+        1200
+      ]
+    ]
+  }
+}

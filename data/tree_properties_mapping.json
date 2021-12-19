@@ -1,0 +1,54 @@
+{
+    "height": [
+        "baumhoehe_akt",
+        "baumhoehe"
+    ],
+    "district": [
+        "bezirk"
+    ],
+    "house_number": [
+        "hausnr"
+    ],
+    "plant_year": [
+        "pflanzjahr"
+    ],
+    "street": [
+        "strassenname",
+        "strname"
+    ],
+    "species_botanical": [
+        "art_botanisch",
+        "art_bot"
+    ],
+    "species_german": [
+        "art_deutsch",
+        "art_dtsch"
+    ],
+    "additional_info": [
+        "zusatz"
+    ],
+    "genus": [
+        "gattung_botanisch",
+        "gattung"
+    ],
+    "crown_diameter": [
+        "kronendurchmesser_akt",
+        "kronedurch"
+    ],
+    "circumference": [
+        "stammumfang_akt",
+        "stammumfg"
+    ],
+    "name_number": [
+        "name_number",
+        "namenr"
+    ],
+    "mark": [
+        "kennzeichen",
+        "kennzeich"
+    ],
+    "location_number": [
+        "standort_nr",
+        "standortnr"
+    ]
+}
