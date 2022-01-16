@@ -38,10 +38,8 @@ def __process_raw_tree_data(path):
     with open(path, encoding='utf-8') as f:
         trees_raw = json.load(f)['features']
 
-    pool = Pool(multiprocessing.cpu_count())
-    trees = pool.map(process_tree, trees_raw)
-    pool.close()
-    pool.join()
+    with Pool(multiprocessing.cpu_count()) as pool:
+        trees = pool.map(process_tree, trees_raw)
 
     return [x for x in trees if x]
 

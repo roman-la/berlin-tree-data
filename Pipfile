@@ -7,6 +7,8 @@ name = "pypi"
 shapely = "*"
 utm = "*"
 neomodel = "*"
+requests = "*"
+pandas = "*"
 
 [dev-packages]
 

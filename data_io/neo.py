@@ -1,5 +1,5 @@
 from neomodel import config, db
-from data_io.models import Tree, District, Genus, PrecipitationHeight
+from data_io.models import Tree, District, Genus, PrecipitationHeight, GroundWater
 
 config.DATABASE_URL = 'bolt://neo4j:ezpw@localhost:7687'
 
@@ -53,3 +53,11 @@ def create_precipitation_height(average_daily_p_h):
         for district, p_h in average_daily_p_h[date].items():
             p_h_neo = PrecipitationHeight(value=p_h, date=date).save()
             p_h_neo.district.connect(districts_neo[district])
+
+
+@db.transaction
+def create_ground_water(district_series_averages):
+    for district, df in district_series_averages.items():
+        for date, row in df.iterrows():
+            gw_neo = GroundWater(date=date, relative_water_level=row['pt'], classification=row['classification']).save()
+            gw_neo.district.connect(districts_neo[district])

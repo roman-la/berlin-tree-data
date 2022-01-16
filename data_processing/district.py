@@ -14,6 +14,10 @@ for feature in geojson['features']:
 # See: https://stackoverflow.com/questions/20776205/point-in-polygon-with-geojson-in-python
 def get_district_of_point(row, column):
     lat, long = __row_column_to_lat_long(row, column)
+    return get_district_of_lat_long(lat, long)
+
+
+def get_district_of_lat_long(lat, long):
     for district, polygon in districts.items():
         if polygon.contains(Point(long, lat)):
             return district

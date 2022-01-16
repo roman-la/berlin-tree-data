@@ -3,7 +3,7 @@ import json
 
 # Calculate average yearly genera precipitation height
 # Intervals mainly based on https://www.fva-bw.de/fileadmin/publikationen/sonstiges/180201steckbrief.pdf
-def calculate_genera_p_h_averages():
+def get_genera_average_p_h():
     with open('data/genus_requirements.json', encoding='utf-8') as f:
         genera_requirements = json.load(f)
 

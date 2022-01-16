@@ -32,3 +32,11 @@ class PrecipitationHeight(StructuredNode):
     date = DateProperty()
 
     district = RelationshipTo('District', 'IN')
+
+
+class GroundWater(StructuredNode):
+    relative_water_level = FloatProperty()
+    classification = StringProperty()
+    date = DateProperty()
+
+    district = RelationshipTo('District', 'IN')

@@ -6,32 +6,35 @@ from textwrap import wrap
 import json
 import glob
 from multiprocessing.dummy import Pool
-import multiprocessing
+import pickle
 
 # Regnie source:
 # https://opendata.dwd.de/climate_environment/CDC/grids_germany/daily/regnie/
 
-# Generated with districts.py
+# Generated with district.py
 with open('data/regnie_to_district.json', 'r', encoding='utf-8') as f:
     district_points = json.load(f)
 
 
-# Use multiprocessing for the maps of each year
-def calculate_average_daily_district_p_h():
-    average_daily_district_p_h = {}
-    for archive in glob.glob('data/ra*.tar'):
+def get_daily_district_average_p_h():
+    if not os.path.exists('daily_district_average_p_h.p'):
+        daily_district_average_p_h = {}
+        for archive in glob.glob('data/ra*.tar'):
 
-        input_tuples = [(file_name, daily_p_h_map) for file_name, daily_p_h_map in __read_archive(archive).items()]
+            # Create list of input tuples for multiprocessing
+            input_tuples = [(file_name, daily_p_h_map) for file_name, daily_p_h_map in __read_archive(archive).items()]
 
-        pool = Pool(multiprocessing.cpu_count())
-        result_tuples = pool.map(__process_map, input_tuples)
-        pool.close()
-        pool.join()
+            # TODO: Check if multiprocessing is useful here
+            with Pool() as pool:
+                result_tuples = pool.map(__process_map, input_tuples)
 
-        for t in result_tuples:
-            average_daily_district_p_h[t[0]] = t[1]
+            # Convert result tuples to dict
+            for result_tuple in result_tuples:
+                daily_district_average_p_h[result_tuple[0]] = result_tuple[1]
+    else:
+        daily_district_average_p_h = pickle.load(open('daily_district_average_p_h.p', 'rb'))
 
-    return average_daily_district_p_h
+    return daily_district_average_p_h
 
 
 # Extract daily maps from nested archive
@@ -56,8 +59,8 @@ def __read_archive(path):
 
 
 # Calculate average rainfall per district from daily map
-def __process_map(y):
-    file_name, p_h_map = y
+def __process_map(input_tuple):
+    file_name, p_h_map = input_tuple
     date = datetime.strptime(file_name[2:-3], '%y%m%d').date()
 
     p_h_values = {district: [] for district in district_points}
