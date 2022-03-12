@@ -3,6 +3,8 @@ import utm
 from datetime import datetime
 from multiprocessing.dummy import Pool
 import multiprocessing
+import os
+import pickle
 
 
 # Data sources:
@@ -13,22 +15,27 @@ import multiprocessing
 
 
 def get_trees():
-    wfs_trees = __process_raw_tree_data('data/s_wfs_baumbestand_an.json') + \
-                __process_raw_tree_data('data/s_wfs_baumbestand.json')
-    non_wfs_trees = __process_raw_tree_data('data/s_baumbestand.json') + \
-                    __process_raw_tree_data('data/s_baumbestand_an.json')
+    if not os.path.exists('combined_trees.p'):
+        wfs_trees = __process_raw_tree_data('data/s_wfs_baumbestand_an.json') + \
+                    __process_raw_tree_data('data/s_wfs_baumbestand.json')
+        non_wfs_trees = __process_raw_tree_data('data/s_baumbestand.json') + \
+                        __process_raw_tree_data('data/s_baumbestand_an.json')
 
-    # Calculate missing ids in wfs data
-    wfs_trees_ids = [x['tree_id'] for x in wfs_trees]
-    non_wfs_trees_ids = [x['tree_id'] for x in non_wfs_trees]
-    missing_tree_ids = set(non_wfs_trees_ids) - set(wfs_trees_ids)
+        # Calculate missing ids in wfs data
+        wfs_trees_ids = [x['tree_id'] for x in wfs_trees]
+        non_wfs_trees_ids = [x['tree_id'] for x in non_wfs_trees]
+        missing_tree_ids = set(non_wfs_trees_ids) - set(wfs_trees_ids)
 
-    combined_trees = wfs_trees
+        combined_trees = wfs_trees
 
-    # Add all missing non_wfs_trees to result
-    for non_wfs_tree in non_wfs_trees:
-        if non_wfs_tree['tree_id'] in missing_tree_ids:
-            combined_trees.append(non_wfs_tree)
+        # Add all missing non_wfs_trees to result
+        for non_wfs_tree in non_wfs_trees:
+            if non_wfs_tree['tree_id'] in missing_tree_ids:
+                combined_trees.append(non_wfs_tree)
+
+        pickle.dump(combined_trees, open('combined_trees.p', 'wb'))
+    else:
+        combined_trees = pickle.load(open('combined_trees.p', 'rb'))
 
     return combined_trees
 

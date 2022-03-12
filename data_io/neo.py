@@ -20,9 +20,9 @@ def clear_db():
 
 
 @db.transaction
-def create_genera(average_yearly_genus_precipitation_height):
-    for genus, average in average_yearly_genus_precipitation_height.items():
-        genera_neo[genus] = Genus(name=genus, precipitation_height_yearly=average).save()
+def create_genera(max_yearly_genus_p_h):
+    for genus, max_p_h in max_yearly_genus_p_h.items():
+        genera_neo[genus] = Genus(name=genus, precipitation_height_yearly=max_p_h).save()
 
 
 @db.transaction
@@ -40,11 +40,9 @@ def create_trees(trees):
 
         tree_neo.district.connect(districts_neo[district])
 
-        if genus in genera_neo:
-            tree_neo.genus.connect(genera_neo[genus])
-        else:
-            # TODO: default value for unknown genus?
+        if genus not in genera_neo:
             genera_neo[genus] = Genus(name=genus, precipitation_height_yearly=0).save()
+        tree_neo.genus.connect(genera_neo[genus])
 
 
 @db.transaction
